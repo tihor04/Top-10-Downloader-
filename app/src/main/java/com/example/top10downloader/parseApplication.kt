@@ -26,7 +26,7 @@ class parseApplication {
             var currentRecord=FeedEntry()
 
             while(eventType!=XmlPullParser.END_DOCUMENT){
-                var tagName=xpp.name.toLowerCase() //TODO: we should use a safe call operator.
+                var tagName=xpp.name?.toLowerCase()
                 when(eventType) {
 
                     XmlPullParser.START_TAG ->{
