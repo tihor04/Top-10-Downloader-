@@ -1,11 +1,15 @@
 package com.example.top10downloader
 
+import android.content.Context
 import android.os.AsyncTask
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Log
+import android.widget.ArrayAdapter
+import android.widget.ListView
 
 import java.net.URL
+import kotlin.properties.Delegates
 
 class FeedEntry{
     var name :String =""
@@ -16,18 +20,20 @@ class FeedEntry{
 
     //we will use this toString function to see that if everything working fine in the logcat.
 
-    override fun toString(): String {
-        return """"
-            name= $name
-            artist= $artist
-            relaeasedate= $releaseDate
-            imageurl= $imageurl
-            """.trimIndent()
-    }
+//    //override fun toString(): String {
+//        return """"
+//            name= $name
+//            artist= $artist
+//            relaeasedate= $releaseDate
+//            imageurl= $imageurl
+//            """.trimIndent()
+//    }
 }
 
 class MainActivity : AppCompatActivity() {
     private val TAG="mainActivity"
+
+    private val downloadData by lazy {DownloadData(this,findViewById(R.id.xmlListView))}
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -35,18 +41,34 @@ class MainActivity : AppCompatActivity() {
 
         Log.d(TAG,"onCreatetag")
 
-        val downloaddata=DownloadData()
-        downloaddata.execute("http://ax.itunes.apple.com/WebObjects/MZStoreServices.woa/ws/RSS/topfreeapplications/limit=10/xml")
+
+        downloadData.execute("https://rss.applemarketingtools.com/api/v2/in/apps/top-free/10/apps.json")
         Log.d(TAG,"On create done")
 
 
     }
 
+    override fun onDestroy() {
+        super.onDestroy()
+        downloadData.cancel(true)
+    }
+
     //implementing the async task for our app
 
     companion object {
-        private class DownloadData() :  AsyncTask<String, Void, String>(){
+        private class DownloadData(context: Context, listview:ListView) :  AsyncTask<String, Void, String>(){
             private val TAG="DownloadData"
+
+
+            // we initialis these in this way because we make have some data leaks from these operations
+
+            var propcontext:Context by Delegates.notNull()
+            var proplistview:ListView by Delegates.notNull()
+
+            init{
+                propcontext=context
+                proplistview=listview
+            }
 
             override fun doInBackground(vararg url: String?): String {
 
@@ -65,6 +87,9 @@ class MainActivity : AppCompatActivity() {
                 super.onPostExecute(result)
                 val parseapplication=parseApplication()
                 parseapplication.parse(result)
+
+                var arrayadpater =FeedAdapter(propcontext,R.layout.list_record,parseapplication.applications)
+                proplistview.adapter=arrayadpater
             }
         }
 
