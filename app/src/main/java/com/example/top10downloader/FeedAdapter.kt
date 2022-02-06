@@ -1,40 +1,60 @@
 package com.example.top10downloader
 
 import android.content.Context
-import android.util.Log
+
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ArrayAdapter
 import android.widget.TextView
 
+class ViewHolder(v:View){
+    val tvname:TextView=v.findViewById(R.id.tv_name)
+    val tvartist:TextView=v.findViewById(R.id.tv_artist)
+    val tvinfo :TextView=v.findViewById(R.id.tv_info)
+}
+
+
 class FeedAdapter (context: Context,private  var resource:Int,private val applications:List<FeedEntry>):
     ArrayAdapter<FeedEntry>(context,resource,applications){
-    private val TAG="FeedAdapter"
+
 
 
     private val inflater=LayoutInflater.from(context)
 
 
     override fun getView(position: Int, convertView: View?, parent: ViewGroup): View {
-        Log.d(TAG,"getView called")
-       val view= inflater.inflate(resource,parent,false)
 
-        val tvname:TextView=view.findViewById(R.id.tv_name)
-        val tvartist:TextView=view.findViewById(R.id.tv_artist)
-        val tvinfo :TextView=view.findViewById(R.id.tv_info)
+
+        val view :View
+
+        val viewholder:ViewHolder
+
+        if(convertView== null){
+
+            view=inflater.inflate(resource,parent,false)
+            viewholder=ViewHolder(view)
+            view.tag =viewholder
+
+        }
+        else{
+
+            view=convertView
+            viewholder=view.tag as ViewHolder
+        }
+
 
         val currentapplication =applications[position]
 
-        tvname.text=currentapplication.name
-        tvartist.text=currentapplication.artist
-        tvinfo.text=currentapplication.summery
+        viewholder.tvname.text=currentapplication.name
+        viewholder.tvartist.text=currentapplication.artist
+        viewholder.tvinfo.text=currentapplication.summery
 
         return view
     }
 
     override fun getCount(): Int {
-        Log.d(TAG,"getCount called")
+
         return applications.size
     }
 }

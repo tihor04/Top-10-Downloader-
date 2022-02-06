@@ -5,7 +5,9 @@ import android.os.AsyncTask
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Log
-import android.widget.ArrayAdapter
+import android.view.Menu
+import android.view.MenuItem
+
 import android.widget.ListView
 
 import java.net.URL
@@ -18,22 +20,13 @@ class FeedEntry{
     var summery :String=""
     var imageurl:String=""
 
-    //we will use this toString function to see that if everything working fine in the logcat.
 
-//    //override fun toString(): String {
-//        return """"
-//            name= $name
-//            artist= $artist
-//            relaeasedate= $releaseDate
-//            imageurl= $imageurl
-//            """.trimIndent()
-//    }
 }
 
 class MainActivity : AppCompatActivity() {
     private val TAG="mainActivity"
 
-    private val downloadData by lazy {DownloadData(this,findViewById(R.id.xmlListView))}
+    private var downloadData :DownloadData?=null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -42,15 +35,44 @@ class MainActivity : AppCompatActivity() {
         Log.d(TAG,"onCreatetag")
 
 
-        downloadData.execute("https://rss.applemarketingtools.com/api/v2/in/apps/top-free/10/apps.json")
+        downloadData?.execute("http://ax.itunes.apple.com/WebObjects/MZStoreServices.woa/ws/RSS/topfreeapplications/limit=10/xml")
         Log.d(TAG,"On create done")
+    }
 
+    private fun downloadUrl(feedUrl:String){
 
+        Log.d(TAG,"DownloadURL started")
+        downloadData=DownloadData(this,findViewById(R.id.xmlListView))
+        downloadData?.execute(feedUrl)
+
+        Log.d(TAG,"downloadURL done")
+    }
+
+    override fun onCreateOptionsMenu(menu: Menu?): Boolean {
+        menuInflater.inflate(R.menu.feeds_menu,menu)
+        return true
+    }
+
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        val feedUrl:String
+
+        when(item.itemId){
+            R.id.mnufree->
+                feedUrl= "http://ax.itunes.apple.com/WebObjects/MZStoreServices.woa/ws/RSS/topfreeapplications/limit=10/xml"
+            R.id.mnupaid->
+                    feedUrl="http://ax.itunes.apple.com/WebObjects/MZStoreServices.woa/ws/RSS/toppaidapplications/limit=10/xml"
+            R.id.mnusongs->
+                feedUrl="http://ax.itunes.apple.com/WebObjects/MZStoreServices.woa/ws/RSS/topsongs/limit=10/xml"
+            else->
+                return super.onOptionsItemSelected(item)
+        }
+        downloadUrl(feedUrl)
+        return true
     }
 
     override fun onDestroy() {
         super.onDestroy()
-        downloadData.cancel(true)
+        downloadData?.cancel(true)
     }
 
     //implementing the async task for our app

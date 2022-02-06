@@ -26,11 +26,11 @@ class parseApplication {
             var currentRecord=FeedEntry()
 
             while(eventType!=XmlPullParser.END_DOCUMENT){
-                var tagName=xpp.name?.toLowerCase()
+                var tagName= xpp.name?.toLowerCase()
                 when(eventType) {
 
                     XmlPullParser.START_TAG ->{
-                        Log.d(TAG, "Parse : end tag for $tagName")
+                        //Log.d(TAG, "Parse : end tag for $tagName")
                     if (tagName == "entry") {
                         inEntry = true
                     }
@@ -39,7 +39,7 @@ class parseApplication {
                     XmlPullParser.TEXT->textValue=xpp.text
 
                     XmlPullParser.END_TAG->{
-                        Log.d(TAG,"parse:Ending tag for $tagName")
+                      //  Log.d(TAG,"parse:Ending tag for $tagName")
                         if(inEntry){
                             when(tagName){
                                 "entry"->{
@@ -50,8 +50,8 @@ class parseApplication {
                                 }
                                 "name"->currentRecord.name=textValue
                                 "artist"->currentRecord.artist=textValue
-                                "releaseDate"->currentRecord.artist=textValue
-                                "summery"->currentRecord.artist=textValue
+                                "releaseDate"->currentRecord.releaseDate=textValue
+                                "summery"->currentRecord.summery=textValue
                                 "image"->currentRecord.imageurl=textValue
 
                             }
@@ -64,11 +64,11 @@ class parseApplication {
                 }
                 eventType=xpp.next()
             }
-            for(app in applications)
-            {
-                Log.d(TAG,"******************")
-                Log.d(TAG,app.toString())
-            }
+//            for(app in applications)
+//            {
+//               // Log.d(TAG,"******************")
+//                Log.d(TAG,app.toString())
+//            }
 
         }catch (e:Exception)
         {
